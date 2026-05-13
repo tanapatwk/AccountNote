@@ -4,6 +4,7 @@ using AccountNote.Api.Exceptions;
 using AccountNote.Api.Models;
 using AccountNote.Api.Repositories;
 using DbUp;
+using DbUp.Engine;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 
@@ -110,6 +111,8 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
+// ====== Account Channel Section ========
+
 // GetAllAccountTypesAsync()
 app.MapGet("/account-types", async (IAccountTypeRepository repo) =>
 {
@@ -159,12 +162,59 @@ app.MapPut("/account-types/{id}", async (int id, AccountTypeRequest request, IAc
     };
     
     await repo.UpdateAccountTypeAsync(accountType);
-    return Results.Created($"/account-types/{accountType.Id}", accountType);
+    return Results.NoContent();
 });
 
 app.MapDelete("/account-types/{id}", async(int id, IAccountTypeRepository repo) =>
 {
     await repo.DeleteAccountTypeAsync(id);
+    return Results.NoContent();
+});
+
+// ====== Account Channel Section ========
+
+app.MapGet("/account-channels/", async (IAccountChannelRepository repo) =>
+{
+    var accountCh = (await repo.GetAllAccountChannelsAsync())
+        .Select(t => new AccountChannelResponse(
+            t.Id, t.Title, t.Description, t.CreatedAt));
+    return Results.Ok(accountCh);
+});
+
+app.MapGet("/account-channels/{id}", async (int id, IAccountChannelRepository repo) =>
+{
+    var accountCh = (await repo.GetAccountChannelByIdAsync(id));
+    return Results.Ok(new AccountChannelResponse(
+        accountCh.Id, accountCh.Title, accountCh.Description, accountCh.CreatedAt));
+});
+
+app.MapPost("/account-channels/", async (AccountChannelRequest request, IAccountChannelRepository repo) =>
+{
+    var accountChannel = new AccountChannel
+    {
+        Title = request.Title,
+        Description = request.Description
+    };
+    
+    await repo.AddAccountChannelAsync(accountChannel);
+    return Results.Created("/account-channels/", null);
+});
+
+app.MapPut("/account-channels/{id}", async (int id, AccountChannelRequest request, IAccountChannelRepository repo) =>
+{
+    var accountChannel = new AccountChannel
+    {
+        Id = id,
+        Title = request.Title,
+        Description = request.Description
+    };
+    await repo.UpdateAccountChannelAsync(accountChannel);
+    return Results.NoContent();
+});
+
+app.MapDelete("/account-channels/{id}", async (int id, IAccountChannelRepository repo) =>
+{
+    await repo.DeleteAccountChannelAsync(id);
     return Results.NoContent();
 });
 

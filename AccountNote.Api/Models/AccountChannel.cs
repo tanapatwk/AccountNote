@@ -5,5 +5,5 @@ public class AccountChannel
     public int Id { get; set; }
     public required string Title { get; set; }
     public string? Description { get; set; }
-    public required string CreatedAt { get; set; }
+    public string CreatedAt { get; set; } = string.Empty;
 }
