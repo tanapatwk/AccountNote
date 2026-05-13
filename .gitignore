@@ -3,3 +3,17 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+# Database files — สำคัญมากครับ ไม่ควร commit ไฟล์ DB จริง
+*.db
+*.db-shm
+*.db-wal
+
+# User-specific Rider settings
+.idea/
+
+# Environment / secrets
+*.env
+appsettings.Local.json
+
+# macOS
+.DS_Store

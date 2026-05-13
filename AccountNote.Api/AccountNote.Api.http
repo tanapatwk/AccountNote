@@ -1,6 +1,25 @@
 @AccountNote.Api_HostAddress = http://localhost:5001
 
-GET {{AccountNote.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Get All Account Types
+GET http://localhost:5001/account-types
 
-###
+### Add Account Type
+POST http://localhost:5001/account-types
+Content-Type: application/json
+
+{
+  "isPaid": 1,
+  "title": "อาหาร"
+}
+
+### Edit Account Type
+PUT http://localhost:5001/account-types/1
+Content-Type: application/json
+
+{
+  "isPaid": 0,
+  "title": "อาหาร"
+}
+
+### Delete Account Type
+DELETE http://localhost:5001/account-types/1
