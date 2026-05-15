@@ -34,8 +34,7 @@ public class AccountChannelRepository(string connectionString) : IAccountChannel
 
     public async Task AddAccountChannelAsync(AccountChannel accountChannel)
     {
-        if(accountChannel is null)
-            throw new AccountChannelValidationError("ค่าของ AccountChannel เป็น null");
+        ValidateAccountChannel(accountChannel);
         
         await using var conn = new SqliteConnection(_connectionString);
         await conn.ExecuteAsync(@"
@@ -51,8 +50,8 @@ public class AccountChannelRepository(string connectionString) : IAccountChannel
 
     public async Task UpdateAccountChannelAsync(AccountChannel accountChannel)
     {
-        if(accountChannel is null)
-            throw new AccountChannelValidationError("ค่า AccountChannel เป็น null");
+        ValidateAccountChannel(accountChannel);
+        
         await GetAccountChannelByIdAsync(accountChannel.Id);
         
         await using var conn = new SqliteConnection(_connectionString);
@@ -77,5 +76,14 @@ public class AccountChannelRepository(string connectionString) : IAccountChannel
             DELETE FROM AccountChannel
             WHERE Id = @Id;", new { Id = id }
         );
+    }
+
+    public void ValidateAccountChannel(AccountChannel accountChannel)
+    {
+        if(accountChannel is null)
+            throw new AccountTypeValidationError("ค่า AccountChannel เป็น null");
+
+        if (string.IsNullOrWhiteSpace(accountChannel.Title))
+            throw new AccountTypeValidationError("ค่า Title ของ AccountChannel เป็นค่าว่าง");
     }
 }

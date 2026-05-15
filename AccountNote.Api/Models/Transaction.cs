@@ -9,5 +9,5 @@ public class Transaction
     public required string Description { get; set; }
     public required double  Amount { get; set; }
     public string Remark { get; set; } = string.Empty;
-    public required string CreatedAt { get; set; }
+    public string CreatedAt { get; set; } = string.Empty;
 }

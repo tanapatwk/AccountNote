@@ -1,10 +1,18 @@
-@AccountNote.Api_HostAddress = http://localhost:5001
+@baseUrl = http://localhost:5001
+
+# ====== Account Type Section ========
 
 ### Get All Account Types
-GET http://localhost:5001/account-types
+GET {{baseUrl}}/account-types
 
-### Add Account Type
-POST http://localhost:5001/account-types
+### Get Account Type By Id
+GET {{baseUrl}}/account-types/1
+
+### Get Account Type By Id — Not Found
+GET {{baseUrl}}/account-types/999
+
+### Add Account Type (รายจ่าย-อาหาร)
+POST {{baseUrl}}/account-types/
 Content-Type: application/json
 
 {
@@ -12,14 +20,213 @@ Content-Type: application/json
   "title": "อาหาร"
 }
 
-### Edit Account Type
-PUT http://localhost:5001/account-types/1
+### Add Account Type (รายจ่าย-เดินทาง)
+POST {{baseUrl}}/account-types/
 Content-Type: application/json
 
 {
-  "isPaid": 0,
+  "isPaid": 1,
+  "title": "เดินทาง"
+}
+
+### Add Account Type (รายจ่าย-ของใช้ส่วนตัว)
+POST {{baseUrl}}/account-types/
+Content-Type: application/json
+
+{
+  "isPaid": true,
+  "title": "ค่าเดินทาง"
+}
+
+
+### Add Account Type (รายรับ)
+POST {{baseUrl}}/account-types/
+Content-Type: application/json
+
+{
+  "isPaid": false,
+  "title": "เงินเดือน"
+}
+
+### Add Account Type — Validation Error (null title)
+POST {{baseUrl}}/account-types/
+Content-Type: application/json
+
+{
+  "isPaid": true,
+  "title": ""
+}
+
+### Update Account Type
+PUT {{baseUrl}}/account-types/1
+Content-Type: application/json
+
+{
+  "isPaid": true,
+  "title": "อาหารและเครื่องดื่ม"
+}
+
+### Update Account Type — Not Found
+PUT {{baseUrl}}/account-types/999
+Content-Type: application/json
+
+{
+  "isPaid": 1,
   "title": "อาหาร"
 }
 
 ### Delete Account Type
-DELETE http://localhost:5001/account-types/1
+DELETE {{baseUrl}}/account-types/1
+
+### Delete Account Type — Not Found
+DELETE {{baseUrl}}/account-types/999
+
+
+# ====== Account Channel Section ========
+
+### Get All Account Channels
+GET {{baseUrl}}/account-channels/
+
+### Get Account Channel By Id
+GET {{baseUrl}}/account-channels/1
+
+### Get Account Channel By Id — Not Found
+GET {{baseUrl}}/account-channels/999
+
+### Add Account Channel (มี Description)
+POST {{baseUrl}}/account-channels/
+Content-Type: application/json
+
+{
+  "title": "เงินสด",
+  "description": "จ่ายด้วยเงินสด"
+}
+
+### Add Account Channel (ไม่มี Description)
+POST {{baseUrl}}/account-channels/
+Content-Type: application/json
+
+{
+  "title": "บัตรเครดิต",
+  "description": null
+}
+
+### Update Account Channel
+PUT {{baseUrl}}/account-channels/1
+Content-Type: application/json
+
+{
+  "title": "เงินสด",
+  "description": "จ่ายด้วยเงินสดเท่านั้น"
+}
+
+### Update Account Channel — Not Found
+PUT {{baseUrl}}/account-channels/999
+Content-Type: application/json
+
+{
+  "title": "เงินสด",
+  "description": null
+}
+
+### Delete Account Channel
+DELETE {{baseUrl}}/account-channels/1
+
+### Delete Account Channel — Not Found
+DELETE {{baseUrl}}/account-channels/999
+
+
+# ======= Transaction Section =======
+
+### Get All Transactions
+GET {{baseUrl}}/transactions/
+
+### Get Transaction By Id
+GET {{baseUrl}}/transactions/1
+
+### Get Transaction By Id — Not Found
+GET {{baseUrl}}/transactions/999
+
+### Add Transaction (รายจ่าย)
+POST {{baseUrl}}/transactions/
+Content-Type: application/json
+
+{
+  "accDate": "2026-05-13",
+  "accTypeId": 1,
+  "accChId": 1,
+  "description": "ข้าวมันไก่",
+  "amount": 50.00,
+  "remark": "กินคนเดียว"
+}
+
+### Add Transaction (ไม่มี Remark)
+POST {{baseUrl}}/transactions/
+Content-Type: application/json
+
+{
+  "accDate": "2026-05-13",
+  "accTypeId": 2,
+  "accChId": 2,
+  "description": "เงินเดือน",
+  "amount": 30000.00,
+  "remark": null
+}
+
+### Add Transaction — AccTypeId Not Found
+POST {{baseUrl}}/transactions/
+Content-Type: application/json
+
+{
+  "accDate": "2026-05-13",
+  "accTypeId": 999,
+  "accChId": 1,
+  "description": "ทดสอบ",
+  "amount": 100.00,
+  "remark": null
+}
+
+### Add Transaction — Invalid Date Format
+POST {{baseUrl}}/transactions/
+Content-Type: application/json
+
+{
+  "accDate": "13-05-2026",
+  "accTypeId": 1,
+  "accChId": 1,
+  "description": "ทดสอบ",
+  "amount": 100.00,
+  "remark": null
+}
+
+### Update Transaction
+PUT {{baseUrl}}/transactions/1
+Content-Type: application/json
+
+{
+  "accDate": "2026-05-13",
+  "accTypeId": 1,
+  "accChId": 1,
+  "description": "ข้าวมันไก่ + น้ำเปล่า",
+  "amount": 60.00,
+  "remark": "กินกับเพื่อน"
+}
+
+### Update Transaction — Not Found
+PUT {{baseUrl}}/transactions/999
+Content-Type: application/json
+
+{
+  "accDate": "2026-05-13",
+  "accTypeId": 1,
+  "accChId": 1,
+  "description": "ทดสอบ",
+  "amount": 100.00,
+  "remark": null
+}
+
+### Delete Transaction
+DELETE {{baseUrl}}/transactions/1
+
+### Delete Transaction — Not Found
+DELETE {{baseUrl}}/transactions/999

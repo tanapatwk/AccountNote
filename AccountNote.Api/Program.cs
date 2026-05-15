@@ -1,10 +1,10 @@
+using System.Data.Common;
 using System.Reflection;
 using AccountNote.Api.DTOs;
 using AccountNote.Api.Exceptions;
 using AccountNote.Api.Models;
 using AccountNote.Api.Repositories;
 using DbUp;
-using DbUp.Engine;
 using Microsoft.AspNetCore.Diagnostics;
 using Serilog;
 
@@ -99,6 +99,15 @@ app.UseExceptionHandler(errorApp =>
                 error = accTypeValid.Message
             });
         }
+        else if (exception is DbException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new
+            {
+                error = "เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาตรวจสอบอีกครั้ง"
+            });
+        }
         else
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -111,7 +120,7 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-// ====== Account Channel Section ========
+// ====== Account Type Section ========
 
 // GetAllAccountTypesAsync()
 app.MapGet("/account-types", async (IAccountTypeRepository repo) =>
@@ -215,6 +224,109 @@ app.MapPut("/account-channels/{id}", async (int id, AccountChannelRequest reques
 app.MapDelete("/account-channels/{id}", async (int id, IAccountChannelRepository repo) =>
 {
     await repo.DeleteAccountChannelAsync(id);
+    return Results.NoContent();
+});
+
+// ======= Transaction Section =======
+
+app.MapGet("/transactions/", async (ITransactionRepository repo) =>
+{
+    var transactions = (await repo.GetAllTransactionsAsync())
+        .Select(t => new TransactionResponse(
+            t.Id,
+            t.AccDate,
+            new AccountTypeResponse(
+                t.AccountType.Id,
+                t.AccountType.IsPaid,
+                t.AccountType.Title,
+                t.AccountType.CreatedAt
+            ),
+            new AccountChannelResponse(
+                t.AccountChannel.Id,
+                t.AccountChannel.Title,
+                t.AccountChannel.Description,
+                t.AccountChannel.CreatedAt
+            ),
+            t.Description,
+            t.Amount,
+            t.Remark,
+            t.CreatedAt
+        ));
+    return Results.Ok(transactions);
+});
+
+app.MapGet("/transactions/{id}", async (int id, ITransactionRepository repo) =>
+{
+    var transaction = (await repo.GetTransactionByIdAsync(id));
+    return Results.Ok(new TransactionResponse(
+        transaction.Id,
+        transaction.AccDate,
+        new AccountTypeResponse(
+            transaction.AccountType.Id,
+            transaction.AccountType.IsPaid,
+            transaction.AccountType.Title,
+            transaction.AccountType.CreatedAt
+        ),
+        new AccountChannelResponse(
+            transaction.AccountChannel.Id,
+            transaction.AccountChannel.Title,
+            transaction.AccountChannel.Description,
+            transaction.AccountChannel.CreatedAt
+        ), 
+        transaction.Description,
+        transaction.Amount,
+        transaction.Remark,
+        transaction.CreatedAt
+    ));
+});
+
+app.MapPost("/transactions/", async (
+    TransactionRequest request, 
+    ITransactionRepository transRepo,
+    IAccountChannelRepository accChRepo,
+    IAccountTypeRepository accTypeRepo ) =>
+{
+    var accType = await accTypeRepo.GetAccountTypeByIdAsync(request.AccTypeId);
+    var accCh = await accChRepo.GetAccountChannelByIdAsync(request.AccChId);
+    
+    await transRepo.AddTransactionAsync( new Transaction
+    {   
+        AccDate = request.AccDate,
+        AccountType =  accType,
+        AccountChannel = accCh,
+        Description = request.Description,
+        Amount = request.Amount,
+        Remark = request.Remark,
+    });
+    return Results.Created("/transactions/", null);
+});
+
+app.MapPut("/transactions/{id}", async (
+    int id, 
+    TransactionRequest request,
+    ITransactionRepository transRepo,
+    IAccountTypeRepository accTypeRepo,
+    IAccountChannelRepository accChRepo) =>
+{
+    var accType = await accTypeRepo.GetAccountTypeByIdAsync(request.AccTypeId);
+    var accCh = await accChRepo.GetAccountChannelByIdAsync(request.AccChId);
+
+    await transRepo.UpdateTransactionAsync(new Transaction
+    {
+        Id = id,
+        AccDate = request.AccDate,
+        AccountType =  accType,
+        AccountChannel = accCh,
+        Description = request.Description,
+        Amount = request.Amount,
+        Remark = request.Remark
+    });
+    return Results.NoContent();
+});
+
+app.MapDelete("/transactions/{id}", async (int id, ITransactionRepository repo) =>
+{
+    await repo.DeleteTransactionAsync(id);
     return Results.NoContent();
 });
 

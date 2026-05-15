@@ -1,6 +1,6 @@
 namespace AccountNote.Api.DTOs;
 
 public record AccountTypeRequest(
-    int IsPaid,
+    bool IsPaid,
     string Title
 );
