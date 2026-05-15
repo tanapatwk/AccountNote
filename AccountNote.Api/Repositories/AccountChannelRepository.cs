@@ -81,9 +81,9 @@ public class AccountChannelRepository(string connectionString) : IAccountChannel
     public void ValidateAccountChannel(AccountChannel accountChannel)
     {
         if(accountChannel is null)
-            throw new AccountTypeValidationError("ค่า AccountChannel เป็น null");
+            throw new AccountChannelValidationError("ค่า AccountChannel เป็น null");
 
         if (string.IsNullOrWhiteSpace(accountChannel.Title))
-            throw new AccountTypeValidationError("ค่า Title ของ AccountChannel เป็นค่าว่าง");
+            throw new AccountChannelValidationError("ค่า Title ของ AccountChannel เป็นค่าว่าง");
     }
 }

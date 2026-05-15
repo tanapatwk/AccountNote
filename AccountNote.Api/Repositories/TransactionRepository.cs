@@ -109,8 +109,7 @@ public class TransactionRepository(string connectionString) : ITransactionReposi
         await GetTransactionByIdAsync(id);
 
         await using var conn = new SqliteConnection(_connectionString);
-        await conn.ExecuteAsync(@"
-            DELETE FROM Transactions WHERE Id = @Id", new { Id = id });
+        await conn.ExecuteAsync("DELETE FROM Transactions WHERE Id = @Id", new { Id = id });
     }
 
     private void ValidateTransaction(Transaction transaction)
