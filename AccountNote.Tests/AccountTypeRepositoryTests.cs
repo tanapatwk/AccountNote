@@ -9,7 +9,7 @@ namespace AccountNote.Tests;
 public class AccountTypeRepositoryTests : IDisposable
 {
     private readonly SqliteConnection _keepAlive;
-    private readonly string _connectionString = "Data Source=testdb;Mode=Memory;Cache=Shared";
+    private readonly string _connectionString = "Data Source=AccTypeDb;Mode=Memory;Cache=Shared";
 
     public AccountTypeRepositoryTests() 
     {
